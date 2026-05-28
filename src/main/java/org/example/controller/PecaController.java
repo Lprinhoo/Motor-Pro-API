@@ -1,14 +1,18 @@
 package org.example.controller;
 
+import org.example.dto.PecaResponse;
 import org.example.model.Peca;
+import org.example.model.Usuario; // Importar Usuario
 import org.example.service.PecaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication; // Importar Authentication
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/pecas")
@@ -18,15 +22,29 @@ public class PecaController {
     private PecaService pecaService;
 
     @GetMapping
-    public ResponseEntity<List<Peca>> getAllPecas() {
-        List<Peca> pecas = pecaService.findAll();
-        return ResponseEntity.ok(pecas);
+    public ResponseEntity<List<PecaResponse>> getAllPecas(Authentication authentication) {
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        return ResponseEntity.ok(
+            pecaService.findAllByOficina(usuario.getOficina().getId()).stream()
+                .map(peca -> PecaResponse.builder()
+                    .id(peca.getId())
+                    .nome(peca.getNome())
+                    .preco(peca.getPreco())
+                    .estoque(peca.getEstoque())
+                    .build())
+                .toList()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Peca> getPecaById(@PathVariable UUID id) {
+    public ResponseEntity<PecaResponse> getPecaById(@PathVariable UUID id) {
         return pecaService.findById(id)
-                .map(ResponseEntity::ok)
+                .map(peca -> ResponseEntity.ok(PecaResponse.builder()
+                    .id(peca.getId())
+                    .nome(peca.getNome())
+                    .preco(peca.getPreco())
+                    .estoque(peca.getEstoque())
+                    .build()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

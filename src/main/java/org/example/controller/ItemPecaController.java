@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.ItemPecaResponse;
 import org.example.model.ItemPeca;
 import org.example.service.ItemPecaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/itens-peca")
@@ -18,15 +20,32 @@ public class ItemPecaController {
     private ItemPecaService itemPecaService;
 
     @GetMapping
-    public ResponseEntity<List<ItemPeca>> getAllItensPeca() {
-        List<ItemPeca> itensPeca = itemPecaService.findAll();
-        return ResponseEntity.ok(itensPeca);
+    public ResponseEntity<List<ItemPecaResponse>> getAllItensPeca() {
+        return ResponseEntity.ok(
+            itemPecaService.findAll().stream()
+                .map(itemPeca -> ItemPecaResponse.builder()
+                    .id(itemPeca.getId())
+                    .pecaId(itemPeca.getPeca().getId())
+                    .pecaNome(itemPeca.getPeca().getNome())
+                    .ordemServicoId(itemPeca.getOrdemServico().getId())
+                    .quantidade(itemPeca.getQuantidade())
+                    .precoUnitario(itemPeca.getPrecoUnitario())
+                    .build())
+                .toList()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemPeca> getItemPecaById(@PathVariable UUID id) {
+    public ResponseEntity<ItemPecaResponse> getItemPecaById(@PathVariable UUID id) {
         return itemPecaService.findById(id)
-                .map(ResponseEntity::ok)
+                .map(itemPeca -> ResponseEntity.ok(ItemPecaResponse.builder()
+                    .id(itemPeca.getId())
+                    .pecaId(itemPeca.getPeca().getId())
+                    .pecaNome(itemPeca.getPeca().getNome())
+                    .ordemServicoId(itemPeca.getOrdemServico().getId())
+                    .quantidade(itemPeca.getQuantidade())
+                    .precoUnitario(itemPeca.getPrecoUnitario())
+                    .build()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

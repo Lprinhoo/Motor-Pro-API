@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,8 +25,13 @@ public class OrdemServicoService {
         return ordemServicoRepository.findById(id);
     }
 
+    public List<OrdemServico> findAllByOficina(UUID oficinaId) {
+        return ordemServicoRepository.findByOficinaId(oficinaId);
+    }
+
     @Transactional
     public OrdemServico save(OrdemServico ordemServico) {
+        ordemServico.setValorTotal(calcularValorTotal(ordemServico));
         return ordemServicoRepository.save(ordemServico);
     }
 
@@ -38,9 +44,13 @@ public class OrdemServicoService {
         ordemServico.setStatus(ordemServicoDetails.getStatus());
         ordemServico.setDataAbertura(ordemServicoDetails.getDataAbertura());
         ordemServico.setDataConclusao(ordemServicoDetails.getDataConclusao());
-        ordemServico.setValorTotal(ordemServicoDetails.getValorTotal());
+        // Remove a linha que copia valorTotal diretamente de ordemServicoDetails
+        // ordemServico.setValorTotal(ordemServicoDetails.getValorTotal());
         ordemServico.setVeiculo(ordemServicoDetails.getVeiculo());
-        // Itens de serviço e peça podem precisar de lógica de atualização mais complexa
+        ordemServico.setItensPeca(ordemServicoDetails.getItensPeca()); // Certifique-se de que os itens são atualizados
+        ordemServico.setItensServico(ordemServicoDetails.getItensServico()); // Certifique-se de que os itens são atualizados
+
+        ordemServico.setValorTotal(calcularValorTotal(ordemServico)); // Recalcula o valor total após a atualização dos itens
 
         return ordemServicoRepository.save(ordemServico);
     }
@@ -48,5 +58,19 @@ public class OrdemServicoService {
     @Transactional
     public void deleteById(UUID id) {
         ordemServicoRepository.deleteById(id);
+    }
+
+    private BigDecimal calcularValorTotal(OrdemServico os) {
+        BigDecimal totalPecas = os.getItensPeca() == null ? BigDecimal.ZERO :
+            os.getItensPeca().stream()
+                .map(i -> i.getPrecoUnitario().multiply(BigDecimal.valueOf(i.getQuantidade())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalServicos = os.getItensServico() == null ? BigDecimal.ZERO :
+            os.getItensServico().stream()
+                .map(i -> i.getPrecoUnitario().multiply(BigDecimal.valueOf(i.getQuantidade())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return totalPecas.add(totalServicos);
     }
 }

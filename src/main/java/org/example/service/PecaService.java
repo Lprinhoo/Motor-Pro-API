@@ -24,6 +24,10 @@ public class PecaService {
         return pecaRepository.findById(id);
     }
 
+    public List<Peca> findAllByOficina(UUID oficinaId) {
+        return pecaRepository.findByOficinaId(oficinaId);
+    }
+
     @Transactional
     public Peca save(Peca peca) {
         return pecaRepository.save(peca);

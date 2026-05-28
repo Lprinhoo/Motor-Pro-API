@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.OficinaResponse;
 import org.example.model.Oficina;
 import org.example.service.OficinaService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/oficinas")
@@ -18,15 +20,30 @@ public class OficinaController {
     private OficinaService oficinaService;
 
     @GetMapping
-    public ResponseEntity<List<Oficina>> getAllOficinas() {
-        List<Oficina> oficinas = oficinaService.findAll();
-        return ResponseEntity.ok(oficinas);
+    public ResponseEntity<List<OficinaResponse>> getAllOficinas() {
+        return ResponseEntity.ok(
+            oficinaService.findAll().stream()
+                .map(oficina -> OficinaResponse.builder()
+                    .id(oficina.getId())
+                    .nome(oficina.getNome())
+                    .endereco(oficina.getEndereco())
+                    .telefone(oficina.getTelefone())
+                    .email(oficina.getEmail())
+                    .build())
+                .toList()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Oficina> getOficinaById(@PathVariable UUID id) {
+    public ResponseEntity<OficinaResponse> getOficinaById(@PathVariable UUID id) {
         return oficinaService.findById(id)
-                .map(ResponseEntity::ok)
+                .map(oficina -> ResponseEntity.ok(OficinaResponse.builder()
+                    .id(oficina.getId())
+                    .nome(oficina.getNome())
+                    .endereco(oficina.getEndereco())
+                    .telefone(oficina.getTelefone())
+                    .email(oficina.getEmail())
+                    .build()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
