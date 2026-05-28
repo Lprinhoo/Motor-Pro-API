@@ -24,6 +24,10 @@ public class ServicoService {
         return servicoRepository.findById(id);
     }
 
+    public List<Servico> findAllByOficina(UUID oficinaId) {
+        return servicoRepository.findByOficinaId(oficinaId);
+    }
+
     @Transactional
     public Servico save(Servico servico) {
         return servicoRepository.save(servico);

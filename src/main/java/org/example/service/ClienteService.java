@@ -24,6 +24,10 @@ public class ClienteService {
         return clienteRepository.findById(id);
     }
 
+    public List<Cliente> findAllByOficina(UUID oficinaId) {
+        return clienteRepository.findByOficinaId(oficinaId);
+    }
+
     @Transactional
     public Cliente save(Cliente cliente) {
         return clienteRepository.save(cliente);

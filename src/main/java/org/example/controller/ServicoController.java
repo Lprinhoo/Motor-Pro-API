@@ -1,14 +1,18 @@
 package org.example.controller;
 
+import org.example.dto.ServicoResponse;
 import org.example.model.Servico;
+import org.example.model.Usuario; // Importar Usuario
 import org.example.service.ServicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication; // Importar Authentication
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/servicos")
@@ -18,15 +22,29 @@ public class ServicoController {
     private ServicoService servicoService;
 
     @GetMapping
-    public ResponseEntity<List<Servico>> getAllServicos() {
-        List<Servico> servicos = servicoService.findAll();
-        return ResponseEntity.ok(servicos);
+    public ResponseEntity<List<ServicoResponse>> getAllServicos(Authentication authentication) {
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        return ResponseEntity.ok(
+            servicoService.findAllByOficina(usuario.getOficina().getId()).stream()
+                .map(servico -> ServicoResponse.builder()
+                    .id(servico.getId())
+                    .nome(servico.getNome())
+                    .descricao(servico.getDescricao())
+                    .preco(servico.getPreco())
+                    .build())
+                .toList()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Servico> getServicoById(@PathVariable UUID id) {
+    public ResponseEntity<ServicoResponse> getServicoById(@PathVariable UUID id) {
         return servicoService.findById(id)
-                .map(ResponseEntity::ok)
+                .map(servico -> ResponseEntity.ok(ServicoResponse.builder()
+                    .id(servico.getId())
+                    .nome(servico.getNome())
+                    .descricao(servico.getDescricao())
+                    .preco(servico.getPreco())
+                    .build()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 

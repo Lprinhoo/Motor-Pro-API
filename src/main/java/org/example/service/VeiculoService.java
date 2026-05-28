@@ -24,6 +24,10 @@ public class VeiculoService {
         return veiculoRepository.findById(id);
     }
 
+    public List<Veiculo> findAllByOficina(UUID oficinaId) {
+        return veiculoRepository.findByOficinaId(oficinaId);
+    }
+
     @Transactional
     public Veiculo save(Veiculo veiculo) {
         return veiculoRepository.save(veiculo);

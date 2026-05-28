@@ -1,14 +1,18 @@
 package org.example.controller;
 
+import org.example.dto.OrdemServicoResponse;
 import org.example.model.OrdemServico;
+import org.example.model.Usuario; // Importar Usuario
 import org.example.service.OrdemServicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication; // Importar Authentication
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/ordens-servico")
@@ -18,9 +22,22 @@ public class OrdemServicoController {
     private OrdemServicoService ordemServicoService;
 
     @GetMapping
-    public ResponseEntity<List<OrdemServico>> getAllOrdensServico() {
-        List<OrdemServico> ordensServico = ordemServicoService.findAll();
-        return ResponseEntity.ok(ordensServico);
+    public ResponseEntity<List<OrdemServicoResponse>> getAllOrdensServico(Authentication authentication) {
+        Usuario usuario = (Usuario) authentication.getPrincipal();
+        return ResponseEntity.ok(
+            ordemServicoService.findAllByOficina(usuario.getOficina().getId()).stream()
+                .map(os -> OrdemServicoResponse.builder()
+                    .id(os.getId())
+                    .numero(os.getNumero())
+                    .status(os.getStatus().name())
+                    .dataAbertura(os.getDataAbertura())
+                    .dataConclusao(os.getDataConclusao())
+                    .valorTotal(os.getValorTotal())
+                    .veiculoId(os.getVeiculo().getId())
+                    .veiculoPlaca(os.getVeiculo().getPlaca())
+                    .build())
+                .toList()
+        );
     }
 
     @GetMapping("/{id}")

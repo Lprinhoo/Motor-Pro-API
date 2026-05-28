@@ -31,4 +31,7 @@ public class Oficina {
 
     @Column(nullable = false, length = 20)
     private String telefone;
+
+    @Column(length = 100) // Adicionado o campo email
+    private String email;
 }

@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.ItemServicoResponse;
 import org.example.model.ItemServico;
 import org.example.service.ItemServicoService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/itens-servico")
@@ -18,15 +20,32 @@ public class ItemServicoController {
     private ItemServicoService itemServicoService;
 
     @GetMapping
-    public ResponseEntity<List<ItemServico>> getAllItensServico() {
-        List<ItemServico> itensServico = itemServicoService.findAll();
-        return ResponseEntity.ok(itensServico);
+    public ResponseEntity<List<ItemServicoResponse>> getAllItensServico() {
+        return ResponseEntity.ok(
+            itemServicoService.findAll().stream()
+                .map(itemServico -> ItemServicoResponse.builder()
+                    .id(itemServico.getId())
+                    .servicoId(itemServico.getServico().getId())
+                    .servicoNome(itemServico.getServico().getNome())
+                    .ordemServicoId(itemServico.getOrdemServico().getId())
+                    .quantidade(itemServico.getQuantidade())
+                    .precoUnitario(itemServico.getPrecoUnitario())
+                    .build())
+                .toList()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ItemServico> getItemServicoById(@PathVariable UUID id) {
+    public ResponseEntity<ItemServicoResponse> getItemServicoById(@PathVariable UUID id) {
         return itemServicoService.findById(id)
-                .map(ResponseEntity::ok)
+                .map(itemServico -> ResponseEntity.ok(ItemServicoResponse.builder()
+                    .id(itemServico.getId())
+                    .servicoId(itemServico.getServico().getId())
+                    .servicoNome(itemServico.getServico().getNome())
+                    .ordemServicoId(itemServico.getOrdemServico().getId())
+                    .quantidade(itemServico.getQuantidade())
+                    .precoUnitario(itemServico.getPrecoUnitario())
+                    .build()))
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
