@@ -8,6 +8,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional; // Importar Optional
+
 @Service
 public class AuthService {
 
@@ -39,5 +41,19 @@ public class AuthService {
         var user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found after authentication"));
         return jwtService.generateToken(user);
+    }
+
+    // Novo método para solicitar redefinição de senha
+    public void requestPasswordReset(String email) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            // Em um cenário real, aqui você geraria um token de redefinição
+            // e enviaria um e-mail para o usuário com um link contendo esse token.
+            System.out.println("Link de redefinição de senha simulado enviado para: " + email);
+            // Exemplo: emailService.sendPasswordResetEmail(userOptional.get(), resetToken);
+        } else {
+            // Por segurança, não informamos se o e-mail não foi encontrado.
+            System.out.println("Tentativa de redefinição de senha para e-mail não registrado ou mensagem genérica enviada.");
+        }
     }
 }
