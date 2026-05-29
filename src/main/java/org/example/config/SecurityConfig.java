@@ -27,15 +27,14 @@ import java.util.List;
 public class SecurityConfig {
 
     private final UserRepository userRepository;
-    private final JwtAuthenticationFilter jwtAuthFilter;
+    // Removido: private final JwtAuthenticationFilter jwtAuthFilter; // Não injetar aqui para evitar ciclo
 
-    public SecurityConfig(UserRepository userRepository, JwtAuthenticationFilter jwtAuthFilter) {
+    public SecurityConfig(UserRepository userRepository) { // Construtor simplificado
         this.userRepository = userRepository;
-        this.jwtAuthFilter = jwtAuthFilter;
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtAuthFilter) throws Exception { // Injetar como parâmetro
         http
             .csrf(AbstractHttpConfigurer::disable) // Desabilita CSRF para APIs REST
             .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Adiciona configuração CORS
