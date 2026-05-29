@@ -7,4 +7,5 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
+    boolean existsByOficinaIsNotNullAndUsername(String username); // checa se usuário já tem oficina
 }
