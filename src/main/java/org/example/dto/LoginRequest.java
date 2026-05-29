@@ -1,8 +1,7 @@
 package org.example.dto;
 
-public class RegisterRequest {
+public class LoginRequest {
     private String username;
-    private String email;
     private String password;
 
     // Getters e Setters
@@ -12,14 +11,6 @@ public class RegisterRequest {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
     }
 
     public String getPassword() {
