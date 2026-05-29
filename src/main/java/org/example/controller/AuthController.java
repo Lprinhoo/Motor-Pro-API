@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import org.example.dto.EmailRequest; // Importar o novo DTO
 import org.example.dto.LoginRequest;
 import org.example.dto.RegisterRequest;
 import org.example.service.AuthService;
@@ -36,6 +37,18 @@ public class AuthController {
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body("Falha na autenticação: " + e.getMessage());
+        }
+    }
+
+    // Novo endpoint para solicitar redefinição de senha
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@RequestBody EmailRequest request) {
+        try {
+            authService.requestPasswordReset(request.email());
+            return ResponseEntity.ok("Se um usuário com este email existir, um link de redefinição de senha foi enviado.");
+        } catch (RuntimeException e) {
+            // Para segurança, geralmente retornamos uma mensagem genérica mesmo se o email não existir
+            return ResponseEntity.ok("Se um usuário com este email existir, um link de redefinição de senha foi enviado.");
         }
     }
 }
