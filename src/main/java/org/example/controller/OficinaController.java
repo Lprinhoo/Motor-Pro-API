@@ -45,6 +45,14 @@ public class OficinaController {
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Oficina não encontrada."));
     }
 
+    // Novo endpoint para buscar a oficina do usuário autenticado
+    @GetMapping("/minha")
+    public ResponseEntity<?> buscarMinha(@AuthenticationPrincipal UserDetails userDetails) {
+        return oficinaService.findByUsername(userDetails.getUsername())
+                .<ResponseEntity<?>>map(ResponseEntity::ok)
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma oficina cadastrada."));
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable UUID id,
                                        @RequestBody OficinaRequest request,
