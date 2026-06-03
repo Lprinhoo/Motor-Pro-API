@@ -4,10 +4,9 @@ import org.example.model.Oficina;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.Optional; // Importar Optional
 import java.util.UUID;
 
 @Repository
 public interface OficinaRepository extends JpaRepository<Oficina, UUID> {
-    Optional<Oficina> findByUserUsername(String username);
+    // O método findByUserUsername foi removido daqui.
 }
