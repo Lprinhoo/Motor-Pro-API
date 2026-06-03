@@ -58,6 +58,10 @@ public class OficinaService {
         return oficinaRepository.findById(id);
     }
 
+    public Optional<Oficina> findByUsername(String username) {
+        return oficinaRepository.findByUserUsername(username);
+    }
+
     @Transactional
     public Oficina update(UUID id, OficinaRequest request, String username) {
         Oficina oficina = oficinaRepository.findById(id)
