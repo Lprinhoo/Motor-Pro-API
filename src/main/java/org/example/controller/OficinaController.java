@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import jakarta.validation.Valid; // Importar @Valid
 import org.example.dto.OficinaRequest;
 import org.example.dto.OficinaResponse; // Importar o DTO de resposta
 import org.example.model.Oficina;
@@ -39,7 +40,7 @@ public class OficinaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> criar(@RequestBody OficinaRequest request,
+    public ResponseEntity<?> criar(@Valid @RequestBody OficinaRequest request, // Adicionado @Valid
                                    @AuthenticationPrincipal UserDetails userDetails) {
         try {
             Oficina oficina = oficinaService.criar(request, userDetails.getUsername());
@@ -76,7 +77,7 @@ public class OficinaController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable UUID id,
-                                       @RequestBody OficinaRequest request,
+                                       @Valid @RequestBody OficinaRequest request, // Adicionado @Valid
                                        @AuthenticationPrincipal UserDetails userDetails) {
         try {
             Oficina oficina = oficinaService.update(id, request, userDetails.getUsername());

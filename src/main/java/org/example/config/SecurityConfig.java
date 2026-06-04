@@ -52,8 +52,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Em produção, substitua "*" pela URL real do seu frontend
-        config.setAllowedOriginPatterns(List.of("*"));
+        // Para aplicativos Electron rodando de file://, a origem pode ser "null".
+        // Adicione também a URL de desenvolvimento se você tiver uma (ex: http://localhost:3000)
+        config.setAllowedOriginPatterns(List.of("null")); // Alterado para incluir "null"
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);

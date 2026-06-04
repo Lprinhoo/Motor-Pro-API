@@ -35,8 +35,8 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "oficina_id")
+    @OneToOne(fetch = FetchType.LAZY) // Alterado para OneToOne
+    @JoinColumn(name = "oficina_id", unique = true) // Adicionado unique = true
     private Oficina oficina;
 
     // true = dono da oficina, false = funcionário
