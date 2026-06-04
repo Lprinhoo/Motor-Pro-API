@@ -38,7 +38,6 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Adiciona a verificação de roles para todos os endpoints de /api/oficinas/**
                         .requestMatchers("/api/oficinas/**").hasAnyRole("USER", "OWNER")
                         .anyRequest().authenticated()
                 )
