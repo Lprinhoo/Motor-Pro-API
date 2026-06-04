@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
@@ -17,6 +19,8 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 public class User implements UserDetails {
+
+    private static final Logger log = LoggerFactory.getLogger(User.class);
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +52,7 @@ public class User implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         String role = owner ? "ROLE_OWNER" : "ROLE_USER";
+        log.debug("User {} has role: {}", username, role); // Adicionado log
         return List.of(new SimpleGrantedAuthority(role));
     }
 
