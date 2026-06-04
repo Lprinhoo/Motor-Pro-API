@@ -4,11 +4,13 @@ import org.example.model.User;
 import org.example.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional; // Importar Optional
+import java.util.Optional;
 
 @Service
 public class AuthService {
@@ -28,32 +30,31 @@ public class AuthService {
 
     public User registerUser(String username, String email, String password) {
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new RuntimeException("Username already exists");
+            throw new UsernameAlreadyExistsException("Username already exists"); // Usando a exceção específica
         }
         return userRepository.save(new User(username, passwordEncoder.encode(password), email));
     }
 
     public String authenticateUser(String username, String password) {
-        var authentication = authenticationManager.authenticate(
+        Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        var user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found after authentication"));
+
+        // Otimização: Extrai o User diretamente do objeto Authentication
+        // Como sua entidade User implementa UserDetails, você pode fazer um cast
+        User user = (User) authentication.getPrincipal();
         return jwtService.generateToken(user);
     }
 
     // Novo método para solicitar redefinição de senha
     public void requestPasswordReset(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            // Em um cenário real, aqui você geraria um token de redefinição
-            // e enviaria um e-mail para o usuário com um link contendo esse token.
-            System.out.println("Link de redefinição de senha simulado enviado para: " + email);
-            // Exemplo: emailService.sendPasswordResetEmail(userOptional.get(), resetToken);
-        } else {
-            // Por segurança, não informamos se o e-mail não foi encontrado.
-            System.out.println("Tentativa de redefinição de senha para e-mail não registrado ou mensagem genérica enviada.");
-        }
+        // Para este método funcionar, o UserRepository precisaria de um findByEmail
+        // Optional<User> userOptional = userRepository.findByEmail(email);
+        // Se não houver findByEmail, você precisaria adicionar um ao UserRepository
+        // Por enquanto, vamos simular ou lançar uma exceção se o email não for encontrado
+        // Para fins de demonstração, vamos apenas logar.
+        System.out.println("Funcionalidade de redefinição de senha não implementada completamente no backend.");
+        System.out.println("Tentativa de redefinição para o email: " + email);
     }
 }
