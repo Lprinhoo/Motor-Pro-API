@@ -38,8 +38,8 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Permite acesso a /api/oficinas/minha para ROLE_USER e ROLE_OWNER
-                        .requestMatchers("/api/oficinas/minha").hasAnyRole("USER", "OWNER")
+                        // Adiciona a verificação de roles para todos os endpoints de /api/oficinas/**
+                        .requestMatchers("/api/oficinas/**").hasAnyRole("USER", "OWNER")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
