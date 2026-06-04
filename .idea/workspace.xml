@@ -5,9 +5,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2ad11708-6a9a-4564-b986-61fcd63f174f" name="Changes" comment="Atualização de Banco de Dados">
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/config/JwtAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/config/JwtAuthenticationFilter.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/controller/OficinaController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/controller/OficinaController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/dto/OficinaRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/dto/OficinaRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/org/example/model/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/model/User.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -106,7 +109,7 @@
       <workItem from="1780064706712" duration="7451000" />
       <workItem from="1780574497472" duration="4298000" />
       <workItem from="1780581059409" duration="550000" />
-      <workItem from="1780584380064" duration="1261000" />
+      <workItem from="1780584380064" duration="4485000" />
     </task>
     <task id="LOCAL-00001" summary="AIAIAIUIUI">
       <option name="closed" value="true" />
@@ -236,7 +239,23 @@
       <option name="project" value="LOCAL" />
       <updated>1780584713676</updated>
     </task>
-    <option name="localTasksCounter" value="17" />
+    <task id="LOCAL-00017" summary="Atualização de Banco de Dados">
+      <option name="closed" value="true" />
+      <created>1780585665307</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1780585665307</updated>
+    </task>
+    <task id="LOCAL-00018" summary="Atualização de Banco de Dados">
+      <option name="closed" value="true" />
+      <created>1780586391769</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1780586391769</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
