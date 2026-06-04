@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2ad11708-6a9a-4564-b986-61fcd63f174f" name="Changes" comment="Atualização de Banco de Dados">
-      <change beforePath="$PROJECT_DIR$/src/main/java/org/example/repository/OficinaRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/org/example/repository/OficinaRepository.java" afterDir="false" />
-    </list>
+    <list default="true" id="2ad11708-6a9a-4564-b986-61fcd63f174f" name="Changes" comment="Atualização de Banco de Dados" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -101,7 +99,7 @@
       <workItem from="1779810612196" duration="613000" />
       <workItem from="1779974258156" duration="17697000" />
       <workItem from="1780064706712" duration="7451000" />
-      <workItem from="1780574497472" duration="1447000" />
+      <workItem from="1780574497472" duration="4298000" />
     </task>
     <task id="LOCAL-00001" summary="AIAIAIUIUI">
       <option name="closed" value="true" />
@@ -199,7 +197,23 @@
       <option name="project" value="LOCAL" />
       <updated>1780527204959</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="Atualização de Banco de Dados">
+      <option name="closed" value="true" />
+      <created>1780576751814</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1780576751815</updated>
+    </task>
+    <task id="LOCAL-00014" summary="Atualização de Banco de Dados">
+      <option name="closed" value="true" />
+      <created>1780576879495</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1780576879495</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
