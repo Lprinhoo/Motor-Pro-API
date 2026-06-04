@@ -59,7 +59,8 @@ public class OficinaService {
     }
 
     public Optional<Oficina> findByUsername(String username) {
-        return oficinaRepository.findByUserUsername(username);
+        return userRepository.findByUsername(username)
+                .map(User::getOficina); // Pega a oficina do usuário, se existir
     }
 
     @Transactional
