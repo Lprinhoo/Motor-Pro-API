@@ -20,35 +20,20 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
-        try {
-            var user = authService.registerUser(request.username(), request.email(), request.password());
-            return ResponseEntity.status(HttpStatus.CREATED)
-                    .body("Usuário " + user.getUsername() + " registrado com sucesso!");
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+        var user = authService.registerUser(request.username(), request.email(), request.password());
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Usuário " + user.getUsername() + " registrado com sucesso!");
     }
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
-        try {
-            String token = authService.authenticateUser(request.username(), request.password());
-            return ResponseEntity.ok(token);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("Falha na autenticação: " + e.getMessage());
-        }
+        String token = authService.authenticateUser(request.username(), request.password());
+        return ResponseEntity.ok(token);
     }
 
-    // Novo endpoint para solicitar redefinição de senha
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestBody EmailRequest request) {
-        try {
-            authService.requestPasswordReset(request.email());
-            return ResponseEntity.ok("Se um usuário com este email existir, um link de redefinição de senha foi enviado.");
-        } catch (RuntimeException e) {
-            // Para segurança, geralmente retornamos uma mensagem genérica mesmo se o email não existir
-            return ResponseEntity.ok("Se um usuário com este email existir, um link de redefinição de senha foi enviado.");
-        }
+        authService.requestPasswordReset(request.email());
+        return ResponseEntity.ok("Se um usuário com este email existir, um link foi enviado.");
     }
 }

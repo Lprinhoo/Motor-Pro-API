@@ -40,14 +40,10 @@ public class OficinaController {
     }
 
     @PostMapping
-    public ResponseEntity<?> criar(@Valid @RequestBody OficinaRequest request, // Adicionado @Valid
-                                   @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            Oficina oficina = oficinaService.criar(request, userDetails.getUsername());
-            return ResponseEntity.status(HttpStatus.CREATED).body(toOficinaResponse(oficina)); // Retorna DTO
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<OficinaResponse> criar(@Valid @RequestBody OficinaRequest request, // Adicionado @Valid
+                                              @AuthenticationPrincipal UserDetails userDetails) {
+        Oficina oficina = oficinaService.criar(request, userDetails.getUsername());
+        return ResponseEntity.status(HttpStatus.CREATED).body(toOficinaResponse(oficina)); // Retorna DTO
     }
 
     @GetMapping
@@ -76,25 +72,17 @@ public class OficinaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> atualizar(@PathVariable UUID id,
-                                       @Valid @RequestBody OficinaRequest request, // Adicionado @Valid
-                                       @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            Oficina oficina = oficinaService.update(id, request, userDetails.getUsername());
-            return ResponseEntity.ok(toOficinaResponse(oficina)); // Retorna DTO
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<OficinaResponse> atualizar(@PathVariable UUID id,
+                                                  @Valid @RequestBody OficinaRequest request, // Adicionado @Valid
+                                                  @AuthenticationPrincipal UserDetails userDetails) {
+        Oficina oficina = oficinaService.update(id, request, userDetails.getUsername());
+        return ResponseEntity.ok(toOficinaResponse(oficina)); // Retorna DTO
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deletar(@PathVariable UUID id,
-                                     @AuthenticationPrincipal UserDetails userDetails) {
-        try {
-            oficinaService.delete(id, userDetails.getUsername());
-            return ResponseEntity.noContent().build();
-        } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
-        }
+    public ResponseEntity<Void> deletar(@PathVariable UUID id,
+                                    @AuthenticationPrincipal UserDetails userDetails) {
+        oficinaService.delete(id, userDetails.getUsername());
+        return ResponseEntity.noContent().build();
     }
 }

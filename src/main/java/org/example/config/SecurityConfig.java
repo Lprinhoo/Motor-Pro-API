@@ -1,6 +1,7 @@
 package org.example.config;
 
 import org.example.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod; // Import adicionado
@@ -8,6 +9,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity; // Import adicionado
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,12 +26,18 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity // Anotação adicionada
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final RateLimitFilter rateLimitFilter;
 
-    public SecurityConfig(UserRepository userRepository) {
+    @Value("${cors.allowed-origins}")
+    private List<String> allowedOrigins;
+
+    public SecurityConfig(UserRepository userRepository, RateLimitFilter rateLimitFilter) {
         this.userRepository = userRepository;
+        this.rateLimitFilter = rateLimitFilter;
     }
 
     @Bean
@@ -39,18 +47,14 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Exemplo de autorização mais granular (ajuste conforme suas necessidades)
-                        .requestMatchers("/api/oficinas").hasAnyRole("USER", "OWNER") // Listar todas as oficinas
-                        .requestMatchers("/api/oficinas/{id}").hasAnyRole("USER", "OWNER") // Buscar oficina por ID
-                        .requestMatchers("/api/oficinas/minha").hasAnyRole("USER", "OWNER") // Buscar a própria oficina
-                        .requestMatchers(HttpMethod.POST, "/api/oficinas").hasRole("OWNER") // Criar oficina (POST)
-                        .requestMatchers(HttpMethod.PUT, "/api/oficinas/{id}").hasRole("OWNER") // Atualizar oficina (PUT)
-                        .requestMatchers(HttpMethod.DELETE, "/api/oficinas/{id}").hasRole("OWNER") // Deletar oficina (DELETE)
+                        // As configurações de autorização aqui serão substituídas por @PreAuthorize nos métodos dos controllers
+                        // Por enquanto, vamos manter um acesso mais amplo para não quebrar a aplicação
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class) // Adicionado RateLimitFilter
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -59,13 +63,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // ATENÇÃO: Substitua "http://localhost:3000" e "https://seu-frontend.com" pelas URLs REAIS do seu frontend.
-        // Se for um aplicativo Electron rodando de file://, você precisará de uma solução mais robusta
-        // ou configurar o Electron para usar um domínio específico.
-        config.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://seu-frontend.com")); // Exemplo
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true); // Mantenha true se o frontend enviar cookies ou credenciais HTTP
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
