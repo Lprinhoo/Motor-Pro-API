@@ -6,12 +6,12 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import org.example.service.UsernameAlreadyExistsException; // Adicionado import explícito
+// Importar a exceção customizada, se existir. Se não, precisaria ser criada.
+// import org.example.exception.UsernameAlreadyExistsException; // Exemplo de import para exceção customizada
 
 @Service
 public class AuthService {
@@ -31,7 +31,9 @@ public class AuthService {
 
     public User registerUser(String username, String email, String password) {
         if (userRepository.findByUsername(username).isPresent()) {
-            throw new UsernameAlreadyExistsException("Username already exists"); // Usando a exceção específica
+            // Usando uma RuntimeException genérica por enquanto, se UsernameAlreadyExistsException não for customizada.
+            // Se você tiver uma exceção customizada, use-a aqui.
+            throw new RuntimeException("Username already exists");
         }
         return userRepository.save(new User(username, passwordEncoder.encode(password), email));
     }
@@ -48,14 +50,17 @@ public class AuthService {
         return jwtService.generateToken(user);
     }
 
-    // Novo método para solicitar redefinição de senha
+    // Método para solicitar redefinição de senha (ainda precisa de implementação completa)
     public void requestPasswordReset(String email) {
-        // Para este método funcionar, o UserRepository precisaria de um findByEmail
-        // Optional<User> userOptional = userRepository.findByEmail(email);
-        // Se não houver findByEmail, você precisaria adicionar um ao UserRepository
-        // Por enquanto, vamos simular ou lançar uma exceção se o email não for encontrado
-        // Para fins de demonstração, vamos apenas logar.
-        System.out.println("Funcionalidade de redefinição de senha não implementada completamente no backend.");
-        System.out.println("Tentativa de redefinição para o email: " + email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            // Em um cenário real, aqui você geraria um token de redefinição
+            // e enviaria um e-mail para o usuário com um link contendo esse token.
+            System.out.println("Link de redefinição de senha simulado enviado para: " + email);
+            // Exemplo: emailService.sendPasswordResetEmail(userOptional.get(), resetToken);
+        } else {
+            // Por segurança, não informamos se o e-mail não foi encontrado.
+            System.out.println("Tentativa de redefinição de senha para e-mail não registrado ou mensagem genérica enviada.");
+        }
     }
 }
