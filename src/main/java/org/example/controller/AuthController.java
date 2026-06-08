@@ -1,6 +1,5 @@
 package org.example.controller;
 
-import org.example.dto.EmailRequest; // Importar o novo DTO
 import org.example.dto.LoginRequest;
 import org.example.dto.RegisterRequest;
 import org.example.service.AuthService;
@@ -29,11 +28,5 @@ public class AuthController {
     public ResponseEntity<String> login(@RequestBody LoginRequest request) {
         String token = authService.authenticateUser(request.username(), request.password());
         return ResponseEntity.ok(token);
-    }
-
-    @PostMapping("/forgot-password")
-    public ResponseEntity<String> forgotPassword(@RequestBody EmailRequest request) {
-        authService.requestPasswordReset(request.email());
-        return ResponseEntity.ok("Se um usuário com este email existir, um link foi enviado.");
     }
 }
