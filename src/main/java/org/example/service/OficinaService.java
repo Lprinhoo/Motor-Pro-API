@@ -5,6 +5,7 @@ import org.example.model.Oficina;
 import org.example.model.User;
 import org.example.repository.OficinaRepository;
 import org.example.repository.UserRepository;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,11 +25,11 @@ public class OficinaService {
     }
 
     @Transactional
+    @PreAuthorize("hasAnyRole('USER', 'OWNER')")
     public Oficina criar(OficinaRequest request, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-        // Limite: 1 oficina por usuário
         if (user.getOficina() != null) {
             throw new RuntimeException("Você já possui uma oficina cadastrada.");
         }
@@ -42,7 +43,6 @@ public class OficinaService {
 
         oficina = oficinaRepository.save(oficina);
 
-        // Vincula o usuário à oficina e marca como dono
         user.setOficina(oficina);
         user.setOwner(true);
         userRepository.save(user);
@@ -50,20 +50,24 @@ public class OficinaService {
         return oficina;
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'OWNER')")
     public List<Oficina> findAll() {
         return oficinaRepository.findAll();
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'OWNER')")
     public Optional<Oficina> findById(UUID id) {
         return oficinaRepository.findById(id);
     }
 
+    @PreAuthorize("hasAnyRole('USER', 'OWNER')")
     public Optional<Oficina> findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .map(User::getOficina); // Pega a oficina do usuário, se existir
+                .map(User::getOficina);
     }
 
     @Transactional
+    @PreAuthorize("hasRole('OWNER')")
     public Oficina update(UUID id, OficinaRequest request, String username) {
         Oficina oficina = oficinaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Oficina não encontrada."));
@@ -71,9 +75,7 @@ public class OficinaService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-        // Só o dono pode editar
-        if (!user.isOwner() || user.getOficina() == null ||
-                !user.getOficina().getId().equals(id)) {
+        if (user.getOficina() == null || !user.getOficina().getId().equals(id)) {
             throw new RuntimeException("Você não tem permissão para editar esta oficina.");
         }
 
@@ -86,13 +88,12 @@ public class OficinaService {
     }
 
     @Transactional
+    @PreAuthorize("hasRole('OWNER')")
     public void delete(UUID id, String username) {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-        // Só o dono pode deletar
-        if (!user.isOwner() || user.getOficina() == null ||
-                !user.getOficina().getId().equals(id)) {
+        if (user.getOficina() == null || !user.getOficina().getId().equals(id)) {
             throw new RuntimeException("Você não tem permissão para excluir esta oficina.");
         }
 
