@@ -38,7 +38,13 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/oficinas/**").hasAnyRole("USER", "OWNER")
+                        // Exemplo de autorização mais granular (ajuste conforme suas necessidades)
+                        .requestMatchers("/api/oficinas").hasAnyRole("USER", "OWNER") // Listar todas as oficinas
+                        .requestMatchers("/api/oficinas/{id}").hasAnyRole("USER", "OWNER") // Buscar oficina por ID
+                        .requestMatchers("/api/oficinas/minha").hasAnyRole("USER", "OWNER") // Buscar a própria oficina
+                        .requestMatchers(HttpMethod.POST, "/api/oficinas").hasRole("OWNER") // Criar oficina (POST)
+                        .requestMatchers(HttpMethod.PUT, "/api/oficinas/{id}").hasRole("OWNER") // Atualizar oficina (PUT)
+                        .requestMatchers(HttpMethod.DELETE, "/api/oficinas/{id}").hasRole("OWNER") // Deletar oficina (DELETE)
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -52,12 +58,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        // Para aplicativos Electron rodando de file://, a origem pode ser "null".
-        // Adicione também a URL de desenvolvimento se você tiver uma (ex: http://localhost:3000)
-        config.setAllowedOriginPatterns(List.of("null")); // Alterado para incluir "null"
+        // ATENÇÃO: Substitua "http://localhost:3000" e "https://seu-frontend.com" pelas URLs REAIS do seu frontend.
+        // Se for um aplicativo Electron rodando de file://, você precisará de uma solução mais robusta
+        // ou configurar o Electron para usar um domínio específico.
+        config.setAllowedOriginPatterns(List.of("http://localhost:3000", "https://seu-frontend.com")); // Exemplo
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(true); // Mantenha true se o frontend enviar cookies ou credenciais HTTP
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
