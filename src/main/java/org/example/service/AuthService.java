@@ -33,7 +33,7 @@ public class AuthService {
         if (userRepository.findByUsername(username).isPresent()) {
             // Usando uma RuntimeException genérica por enquanto, se UsernameAlreadyExistsException não for customizada.
             // Se você tiver uma exceção customizada, use-a aqui.
-            throw new RuntimeException("Username already exists");
+            throw new UsernameAlreadyExistsException("Nome de usuário já está em uso.");
         }
         return userRepository.save(new User(username, passwordEncoder.encode(password), email));
     }
@@ -48,19 +48,5 @@ public class AuthService {
         // Como sua entidade User implementa UserDetails, você pode fazer um cast
         User user = (User) authentication.getPrincipal();
         return jwtService.generateToken(user);
-    }
-
-    // Método para solicitar redefinição de senha (ainda precisa de implementação completa)
-    public void requestPasswordReset(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            // Em um cenário real, aqui você geraria um token de redefinição
-            // e enviaria um e-mail para o usuário com um link contendo esse token.
-            System.out.println("Link de redefinição de senha simulado enviado para: " + email);
-            // Exemplo: emailService.sendPasswordResetEmail(userOptional.get(), resetToken);
-        } else {
-            // Por segurança, não informamos se o e-mail não foi encontrado.
-            System.out.println("Tentativa de redefinição de senha para e-mail não registrado ou mensagem genérica enviada.");
-        }
     }
 }
