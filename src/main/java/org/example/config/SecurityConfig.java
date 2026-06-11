@@ -32,8 +32,8 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final RateLimitFilter rateLimitFilter;
 
-    @Value("${cors.allowed-origins}")
-    private List<String> allowedOrigins;
+    // @Value("${cors.allowed-origins}") // This is no longer needed as we are using allowedOriginPatterns("*")
+    // private List<String> allowedOrigins;
 
     public SecurityConfig(UserRepository userRepository, RateLimitFilter rateLimitFilter) {
         this.userRepository = userRepository;
@@ -46,6 +46,7 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() // ← adicione essa linha
                         .requestMatchers("/api/auth/**").permitAll()
                         // As configurações de autorização aqui serão substituídas por @PreAuthorize nos métodos dos controllers
                         // Por enquanto, vamos manter um acesso mais amplo para não quebrar a aplicação
@@ -74,9 +75,9 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(allowedOrigins);
+        config.setAllowedOriginPatterns(List.of("*")); // ← em vez de setAllowedOrigins(allowedOrigins)
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));
+        config.setAllowedHeaders(List.of("*")); // ← em vez de lista restrita
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
