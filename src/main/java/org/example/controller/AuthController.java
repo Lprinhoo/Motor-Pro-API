@@ -1,6 +1,7 @@
 package org.example.controller;
 
 import jakarta.validation.Valid;
+import org.example.dto.AuthResponse;
 import org.example.dto.LoginRequest;
 import org.example.dto.RegisterRequest;
 import org.example.service.AuthService;
@@ -26,8 +27,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
         String token = authService.authenticateUser(request.username(), request.password());
-        return ResponseEntity.ok(token);
+        return ResponseEntity.ok(new AuthResponse(token));
     }
 }
