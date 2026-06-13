@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import jakarta.validation.Valid;
 import org.example.dto.LoginRequest;
 import org.example.dto.RegisterRequest;
 import org.example.service.AuthService;
@@ -18,8 +19,8 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@RequestBody RegisterRequest request) {
-        var user = authService.registerUser(request.username(), request.email(), request.password());
+    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
+        var user = authService.registerUser(request); // Chamando o método atualizado
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body("Usuário " + user.getUsername() + " registrado com sucesso!");
     }
