@@ -1,5 +1,6 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -24,6 +25,7 @@ public class Servico {
     @Column(nullable = false)
     private Integer tempoMedioEmMinutos; // Tempo médio em minutos
 
+    @JsonIgnore  // ← adicionar essa linha
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "oficina_id", nullable = false)
     private Oficina oficina;
