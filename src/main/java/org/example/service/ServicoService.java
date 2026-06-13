@@ -57,7 +57,7 @@ public class ServicoService {
 
         Oficina oficina = user.getOficina();
         if (oficina == null) {
-            throw new RuntimeException("O usuário não possui uma oficina associada.");
+            return List.of(); // ← retorna vazio em vez de lançar erro
         }
         return servicoRepository.findByOficinaId(oficina.getId());
     }
