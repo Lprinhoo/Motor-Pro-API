@@ -32,8 +32,8 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final RateLimitFilter rateLimitFilter;
 
-    // @Value("${cors.allowed-origins}") // This is no longer needed as we are using allowedOriginPatterns("*")
-    // private List<String> allowedOrigins;
+    @Value("${cors.allowed-origins}") // Descomentado
+    private List<String> allowedOrigins;
 
     public SecurityConfig(UserRepository userRepository, RateLimitFilter rateLimitFilter) {
         this.userRepository = userRepository;
@@ -75,10 +75,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*")); // ← em vez de setAllowedOrigins(allowedOrigins)
+        config.setAllowedOrigins(allowedOrigins); // Alterado para usar a variável de ambiente
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*")); // ← em vez de lista restrita
-        config.setAllowCredentials(true);
+        config.setAllowedHeaders(List.of("*"));
+        // config.setAllowCredentials(true); // Removido, pois não é seguro com allowedOriginPatterns("*") e não é necessário com origens específicas
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", config);
