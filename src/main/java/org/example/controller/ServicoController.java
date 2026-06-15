@@ -2,7 +2,7 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import org.example.dto.ServicoRequest;
-import org.example.dto.ServicoResponse; // Import adicionado
+import org.example.model.Servico;
 import org.example.service.ServicoService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,21 +29,21 @@ public class ServicoController {
     }
 
     @PostMapping
-    public ResponseEntity<ServicoResponse> createServico(@Valid @RequestBody ServicoRequest request) { // Tipo de retorno alterado
+    public ResponseEntity<Servico> createServico(@Valid @RequestBody ServicoRequest request) {
         String username = getAuthenticatedUsername();
-        ServicoResponse servicoResponse = servicoService.createServico(request, username); // Tipo alterado
-        return ResponseEntity.status(HttpStatus.CREATED).body(servicoResponse);
+        Servico servico = servicoService.createServico(request, username);
+        return ResponseEntity.status(HttpStatus.CREATED).body(servico);
     }
 
     @GetMapping
-    public ResponseEntity<List<ServicoResponse>> getServicosByOficina() { // Tipo de retorno alterado
+    public ResponseEntity<List<Servico>> getServicosByOficina() {
         String username = getAuthenticatedUsername();
-        List<ServicoResponse> servicos = servicoService.getServicosByOficina(username); // Tipo alterado
+        List<Servico> servicos = servicoService.getServicosByOficina(username);
         return ResponseEntity.ok(servicos);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ServicoResponse> getServicoById(@PathVariable UUID id) { // Tipo de retorno alterado
+    public ResponseEntity<Servico> getServicoById(@PathVariable UUID id) {
         String username = getAuthenticatedUsername();
         return servicoService.getServicoById(id, username)
                 .map(ResponseEntity::ok)
@@ -51,9 +51,9 @@ public class ServicoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ServicoResponse> updateServico(@PathVariable UUID id, @Valid @RequestBody ServicoRequest request) { // Tipo de retorno alterado
+    public ResponseEntity<Servico> updateServico(@PathVariable UUID id, @Valid @RequestBody ServicoRequest request) {
         String username = getAuthenticatedUsername();
-        ServicoResponse updatedServico = servicoService.updateServico(id, request, username); // Tipo alterado
+        Servico updatedServico = servicoService.updateServico(id, request, username);
         return ResponseEntity.ok(updatedServico);
     }
 

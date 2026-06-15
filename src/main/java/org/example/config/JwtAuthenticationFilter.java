@@ -15,7 +15,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import io.jsonwebtoken.JwtException; // Import adicionado
 
 import java.io.IOException;
 
@@ -47,15 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        String username = null; // Inicializa username fora do try-catch
-
-        try {
-            username = jwtService.extractUsername(jwt);
-        } catch (JwtException | IllegalArgumentException e) {
-            log.warn("Token JWT inválido: {}", e.getMessage());
-            filterChain.doFilter(request, response); // Continua a cadeia de filtros para que o Spring Security possa lidar com a autenticação ausente
-            return;
-        }
+        final String username = jwtService.extractUsername(jwt);
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
