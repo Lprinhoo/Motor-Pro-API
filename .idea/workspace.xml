@@ -4,7 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="2ad11708-6a9a-4564-b986-61fcd63f174f" name="Changes" comment="Atualização de Banco de Dados" />
+    <list default="true" id="2ad11708-6a9a-4564-b986-61fcd63f174f" name="Changes" comment="Atualização de Banco de Dados">
+      <change beforePath="$PROJECT_DIR$/src/main/resources/db/changelog/001-initial-schema.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/db/changelog/001-initial-schema.yaml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -37,6 +39,7 @@
     <setting file="file://$PROJECT_DIR$/src/main/java/org/example/config/RateLimitFilter.java" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/src/main/java/org/example/config/SecurityConfig.java" root0="SKIP_INSPECTION" />
     <setting file="file://$PROJECT_DIR$/src/main/resources/application.properties" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/src/main/resources/db/changelog/001-initial-schema.yaml" root0="SKIP_INSPECTION" />
   </component>
   <component name="HttpClientEndpointsTabState">
     <option name="cachedRequestData" value="&lt;CachedHttpClientTabRequests&gt;&#10;  &lt;entry key=&quot;414f262a786d8b1049396c7d99a23bdd2c84b065&quot; value=&quot;###&amp;#10;GET http://localhost:8080/&quot; /&gt;&#10;&lt;/CachedHttpClientTabRequests&gt;" />
@@ -361,7 +364,15 @@
       <option name="project" value="LOCAL" />
       <updated>1781527287312</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="Atualização de Banco de Dados">
+      <option name="closed" value="true" />
+      <created>1781529177937</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1781529177937</updated>
+    </task>
+    <option name="localTasksCounter" value="33" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
