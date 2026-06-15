@@ -1,6 +1,8 @@
 package org.example.service;
 
 import org.example.dto.OficinaRequest;
+import org.example.exception.ForbiddenException; // Import adicionado
+import org.example.exception.ResourceNotFoundException; // Import adicionado
 import org.example.model.Oficina;
 import org.example.model.User;
 import org.example.repository.OficinaRepository;
@@ -25,13 +27,13 @@ public class OficinaService {
     }
 
     @Transactional
-    @PreAuthorize("hasAnyRole('USER', 'OWNER')")
+    // @PreAuthorize("hasAnyRole('USER', 'OWNER')") // Removido
     public Oficina criar(OficinaRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado.")); // Alterado
 
         if (user.getOficina() != null) {
-            throw new RuntimeException("Você já possui uma oficina cadastrada.");
+            throw new ForbiddenException("Você já possui uma oficina cadastrada."); // Alterado
         }
 
         Oficina oficina = Oficina.builder()
@@ -70,13 +72,13 @@ public class OficinaService {
     @PreAuthorize("hasRole('OWNER')")
     public Oficina update(UUID id, OficinaRequest request, String username) {
         Oficina oficina = oficinaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Oficina não encontrada."));
+                .orElseThrow(() -> new ResourceNotFoundException("Oficina não encontrada.")); // Alterado
 
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado.")); // Alterado
 
         if (user.getOficina() == null || !user.getOficina().getId().equals(id)) {
-            throw new RuntimeException("Você não tem permissão para editar esta oficina.");
+            throw new ForbiddenException("Você não tem permissão para editar esta oficina."); // Alterado
         }
 
         oficina.setNome(request.nome());
@@ -91,10 +93,10 @@ public class OficinaService {
     @PreAuthorize("hasRole('OWNER')")
     public void delete(UUID id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado.")); // Alterado
 
         if (user.getOficina() == null || !user.getOficina().getId().equals(id)) {
-            throw new RuntimeException("Você não tem permissão para excluir esta oficina.");
+            throw new ForbiddenException("Você não tem permissão para excluir esta oficina."); // Alterado
         }
 
         user.setOficina(null);
