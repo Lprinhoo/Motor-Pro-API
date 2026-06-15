@@ -1,6 +1,43 @@
 databaseChangeLog:
+  # ChangeSet 1: Cria a tabela 'oficinas' primeiro, pois outras tabelas a referenciam
   - changeSet:
       id: 1
+      author: yourname
+      changes:
+        - createTable:
+            tableName: oficinas
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: nome
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: endereco
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: telefone
+                  type: VARCHAR(20)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: email
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+                    unique: true
+
+  # ChangeSet 2: Cria a tabela 'users' e sua chave estrangeira para 'oficinas'
+  - changeSet:
+      id: 2
       author: yourname
       changes:
         - createTable:
@@ -52,41 +89,7 @@ databaseChangeLog:
             referencedColumnNames: id
             constraintName: fk_users_oficina
 
-  - changeSet:
-      id: 2
-      author: yourname
-      changes:
-        - createTable:
-            tableName: oficinas
-            columns:
-              - column:
-                  name: id
-                  type: UUID
-                  constraints:
-                    primaryKey: true
-                    nullable: false
-              - column:
-                  name: nome
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: endereco
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: telefone
-                  type: VARCHAR(20)
-                  constraints:
-                    nullable: false
-              - column:
-                  name: email
-                  type: VARCHAR(255)
-                  constraints:
-                    nullable: false
-                    unique: true
-
+  # ChangeSet 3: Cria a tabela 'servicos' e sua chave estrangeira para 'oficinas'
   - changeSet:
       id: 3
       author: yourname
