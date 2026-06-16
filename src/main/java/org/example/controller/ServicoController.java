@@ -39,7 +39,7 @@ public class ServicoController {
                 servico.getId(),
                 servico.getNome(),
                 servico.getDescricao(),
-                servico.getPreco()
+                servico.getValor()
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(servicoResponse);
     }
@@ -54,7 +54,7 @@ public class ServicoController {
                         servico.getId(),
                         servico.getNome(),
                         servico.getDescricao(),
-                        servico.getPreco()
+                        servico.getValor()
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(servicoResponses);
@@ -68,7 +68,7 @@ public class ServicoController {
                         servico.getId(),
                         servico.getNome(),
                         servico.getDescricao(),
-                        servico.getPreco()
+                        servico.getValor()
                 ))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -83,7 +83,7 @@ public class ServicoController {
                 updatedServico.getId(),
                 updatedServico.getNome(),
                 updatedServico.getDescricao(),
-                updatedServico.getPreco()
+                updatedServico.getValor()
         );
         return ResponseEntity.ok(servicoResponse);
     }
