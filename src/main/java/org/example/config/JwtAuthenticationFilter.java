@@ -1,5 +1,6 @@
 package org.example.config;
 
+import io.jsonwebtoken.JwtException; // Import adicionado
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -46,7 +47,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         final String jwt = authHeader.substring(7);
-        final String username = jwtService.extractUsername(jwt);
+        final String username;
+
+        try {
+            username = jwtService.extractUsername(jwt);
+        } catch (JwtException | IllegalArgumentException e) {
+            log.warn("Token JWT inválido: {}", e.getMessage());
+            filterChain.doFilter(request, response); // Continua a cadeia de filtros sem autenticação
+            return;
+        }
+
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);

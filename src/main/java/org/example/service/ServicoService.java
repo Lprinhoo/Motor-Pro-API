@@ -1,6 +1,8 @@
 package org.example.service;
 
 import org.example.dto.ServicoRequest;
+import org.example.exception.ForbiddenException;
+import org.example.exception.ResourceNotFoundException;
 import org.example.model.Oficina;
 import org.example.model.Servico;
 import org.example.model.User;
@@ -20,7 +22,7 @@ public class ServicoService {
 
     private final ServicoRepository servicoRepository;
     private final UserRepository userRepository;
-    private final OficinaRepository oficinaRepository; // Injetar OficinaRepository para buscar a oficina
+    private final OficinaRepository oficinaRepository;
 
     public ServicoService(ServicoRepository servicoRepository, UserRepository userRepository, OficinaRepository oficinaRepository) {
         this.servicoRepository = servicoRepository;
@@ -32,11 +34,11 @@ public class ServicoService {
     @PreAuthorize("hasRole('OWNER')")
     public Servico createServico(ServicoRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         Oficina oficina = user.getOficina();
         if (oficina == null) {
-            throw new RuntimeException("O usuário não possui uma oficina associada.");
+            throw new ForbiddenException("O usuário não possui uma oficina associada.");
         }
 
         Servico servico = Servico.builder()
@@ -50,14 +52,14 @@ public class ServicoService {
         return servicoRepository.save(servico);
     }
 
-    @PreAuthorize("hasAnyRole('USER', 'OWNER')") // Qualquer usuário pode ver os serviços de uma oficina
+    @PreAuthorize("hasAnyRole('USER', 'OWNER')")
     public List<Servico> getServicosByOficina(String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         Oficina oficina = user.getOficina();
         if (oficina == null) {
-            return List.of(); // ← retorna vazio em vez de lançar erro
+            return List.of();
         }
         return servicoRepository.findByOficinaId(oficina.getId());
     }
@@ -65,33 +67,39 @@ public class ServicoService {
     @PreAuthorize("hasAnyRole('USER', 'OWNER')")
     public Optional<Servico> getServicoById(UUID id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         Oficina oficina = user.getOficina();
         if (oficina == null) {
-            throw new RuntimeException("O usuário não possui uma oficina associada.");
+            throw new ForbiddenException("O usuário não possui uma oficina associada.");
         }
 
-        return servicoRepository.findById(id)
-                .filter(servico -> servico.getOficina().getId().equals(oficina.getId())); // Garante que o serviço pertence à oficina do usuário
+        Servico servico = servicoRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado."));
+
+        if (!servico.getOficina().getId().equals(oficina.getId())) {
+            throw new ForbiddenException("Você não tem permissão para acessar este serviço.");
+        }
+
+        return Optional.of(servico);
     }
 
     @Transactional
     @PreAuthorize("hasRole('OWNER')")
     public Servico updateServico(UUID id, ServicoRequest request, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         Oficina oficina = user.getOficina();
         if (oficina == null) {
-            throw new RuntimeException("O usuário não possui uma oficina associada.");
+            throw new ForbiddenException("O usuário não possui uma oficina associada.");
         }
 
         Servico servico = servicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Serviço não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado."));
 
         if (!servico.getOficina().getId().equals(oficina.getId())) {
-            throw new RuntimeException("Você não tem permissão para editar este serviço.");
+            throw new ForbiddenException("Você não tem permissão para editar este serviço.");
         }
 
         servico.setNome(request.nome());
@@ -106,18 +114,18 @@ public class ServicoService {
     @PreAuthorize("hasRole('OWNER')")
     public void deleteServico(UUID id, String username) {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado."));
 
         Oficina oficina = user.getOficina();
         if (oficina == null) {
-            throw new RuntimeException("O usuário não possui uma oficina associada.");
+            throw new ForbiddenException("O usuário não possui uma oficina associada.");
         }
 
         Servico servico = servicoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Serviço não encontrado."));
+                .orElseThrow(() -> new ResourceNotFoundException("Serviço não encontrado."));
 
         if (!servico.getOficina().getId().equals(oficina.getId())) {
-            throw new RuntimeException("Você não tem permissão para excluir este serviço.");
+            throw new ForbiddenException("Você não tem permissão para excluir este serviço.");
         }
 
         servicoRepository.delete(servico);
