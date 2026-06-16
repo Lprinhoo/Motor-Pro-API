@@ -8,5 +8,4 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
     Optional<User> findByEmail(String email); // Adicionado para redefinição de senha
-    boolean existsByOficinaIsNotNullAndUsername(String username); // checa se usuário já tem oficina
 }

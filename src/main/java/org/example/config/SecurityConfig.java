@@ -32,12 +32,20 @@ public class SecurityConfig {
     private final UserRepository userRepository;
     private final RateLimitFilter rateLimitFilter;
 
-    // @Value("${cors.allowed-origins}") // This is no longer needed as we are using allowedOriginPatterns("*")
-    // private List<String> allowedOrigins;
+    @Value("${cors.allowed-origins}")
+    private List<String> allowedOrigins;
 
-    public SecurityConfig(UserRepository userRepository, RateLimitFilter rateLimitFilter) {
+    private final RestAuthenticationEntryPoint restAuthenticationEntryPoint;
+    private final RestAccessDeniedHandler restAccessDeniedHandler;
+
+    public SecurityConfig(UserRepository userRepository,
+                           RateLimitFilter rateLimitFilter,
+                           RestAuthenticationEntryPoint restAuthenticationEntryPoint,
+                           RestAccessDeniedHandler restAccessDeniedHandler) {
         this.userRepository = userRepository;
         this.rateLimitFilter = rateLimitFilter;
+        this.restAuthenticationEntryPoint = restAuthenticationEntryPoint;
+        this.restAccessDeniedHandler = restAccessDeniedHandler;
     }
 
     @Bean
@@ -54,6 +62,10 @@ public class SecurityConfig {
                 )
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(restAuthenticationEntryPoint)
+                        .accessDeniedHandler(restAccessDeniedHandler)
                 )
                 .headers(headers -> headers
                         .frameOptions(frame -> frame.deny())
@@ -75,9 +87,12 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOriginPatterns(List.of("*")); // ← em vez de setAllowedOrigins(allowedOrigins)
+        // Importante: nunca configurar "*" em cors.allowed-origins quando
+        // allowCredentials=true. Liste explicitamente os domínios do front-end
+        // (ex: https://app.seudominio.com,https://www.seudominio.com).
+        config.setAllowedOrigins(allowedOrigins);
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        config.setAllowedHeaders(List.of("*")); // ← em vez de lista restrita
+        config.setAllowedHeaders(List.of("*"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
