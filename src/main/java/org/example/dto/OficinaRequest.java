@@ -13,11 +13,10 @@ public record OficinaRequest(
         @Size(min = 5, max = 200, message = "O endereço da oficina deve ter entre 5 e 200 caracteres")
         String endereco,
 
-        @NotBlank(message = "O telefone da oficina não pode estar em branco")
+
         @Size(min = 8, max = 20, message = "O telefone da oficina deve ter entre 8 e 20 caracteres")
         String telefone,
 
-        @NotBlank(message = "O email da oficina não pode estar em branco")
         @Email(message = "O email da oficina deve ser válido")
         String email
 ) {}
