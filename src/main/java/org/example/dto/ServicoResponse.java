@@ -7,5 +7,6 @@ public record ServicoResponse(
         UUID id,
         String nome,
         String descricao,
-        BigDecimal preco
+        BigDecimal preco,
+        Integer tempoMedioEmMinutos // Adicionado o campo tempoMedioEmMinutos
 ) {}

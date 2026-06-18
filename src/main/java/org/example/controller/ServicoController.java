@@ -2,7 +2,7 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 import org.example.dto.ServicoRequest;
-import org.example.dto.ServicoResponse; // Import adicionado
+import org.example.dto.ServicoResponse;
 import org.example.model.Servico;
 import org.example.service.ServicoService;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors; // Import adicionado
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/servicos")
@@ -34,12 +34,13 @@ public class ServicoController {
     public ResponseEntity<ServicoResponse> createServico(@Valid @RequestBody ServicoRequest request) {
         String username = getAuthenticatedUsername();
         Servico servico = servicoService.createServico(request, username);
-        // Converte Servico para ServicoResponse
+        // Converte Servico para ServicoResponse, incluindo tempoMedioEmMinutos
         ServicoResponse servicoResponse = new ServicoResponse(
                 servico.getId(),
                 servico.getNome(),
                 servico.getDescricao(),
-                servico.getValor()
+                servico.getValor(),
+                servico.getTempoMedioEmMinutos() // Adicionado
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(servicoResponse);
     }
@@ -48,13 +49,14 @@ public class ServicoController {
     public ResponseEntity<List<ServicoResponse>> getServicosByOficina() {
         String username = getAuthenticatedUsername();
         List<Servico> servicos = servicoService.getServicosByOficina(username);
-        // Converte List<Servico> para List<ServicoResponse>
+        // Converte List<Servico> para List<ServicoResponse>, incluindo tempoMedioEmMinutos
         List<ServicoResponse> servicoResponses = servicos.stream()
                 .map(servico -> new ServicoResponse(
                         servico.getId(),
                         servico.getNome(),
                         servico.getDescricao(),
-                        servico.getValor()
+                        servico.getValor(),
+                        servico.getTempoMedioEmMinutos() // Adicionado
                 ))
                 .collect(Collectors.toList());
         return ResponseEntity.ok(servicoResponses);
@@ -64,11 +66,12 @@ public class ServicoController {
     public ResponseEntity<ServicoResponse> getServicoById(@PathVariable UUID id) {
         String username = getAuthenticatedUsername();
         return servicoService.getServicoById(id, username)
-                .map(servico -> new ServicoResponse( // Converte Servico para ServicoResponse
+                .map(servico -> new ServicoResponse( // Converte Servico para ServicoResponse, incluindo tempoMedioEmMinutos
                         servico.getId(),
                         servico.getNome(),
                         servico.getDescricao(),
-                        servico.getValor()
+                        servico.getValor(),
+                        servico.getTempoMedioEmMinutos() // Adicionado
                 ))
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -78,12 +81,13 @@ public class ServicoController {
     public ResponseEntity<ServicoResponse> updateServico(@PathVariable UUID id, @Valid @RequestBody ServicoRequest request) {
         String username = getAuthenticatedUsername();
         Servico updatedServico = servicoService.updateServico(id, request, username);
-        // Converte Servico para ServicoResponse
+        // Converte Servico para ServicoResponse, incluindo tempoMedioEmMinutos
         ServicoResponse servicoResponse = new ServicoResponse(
                 updatedServico.getId(),
                 updatedServico.getNome(),
                 updatedServico.getDescricao(),
-                updatedServico.getValor()
+                updatedServico.getValor(),
+                updatedServico.getTempoMedioEmMinutos() // Adicionado
         );
         return ResponseEntity.ok(servicoResponse);
     }
