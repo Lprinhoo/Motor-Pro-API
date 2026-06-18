@@ -1,8 +1,10 @@
 package org.example.controller;
 
-import jakarta.validation.Valid; // Importar @Valid
+import jakarta.validation.Valid;
+import org.example.dto.ContatoResponse;
 import org.example.dto.OficinaRequest;
-import org.example.dto.OficinaResponse; // Importar o DTO de resposta
+import org.example.dto.OficinaResponse;
+import org.example.model.Contato;
 import org.example.model.Oficina;
 import org.example.service.OficinaService;
 import org.springframework.http.HttpStatus;
@@ -25,29 +27,27 @@ public class OficinaController {
         this.oficinaService = oficinaService;
     }
 
-    // Método auxiliar para converter Oficina para OficinaResponse
+    private ContatoResponse toContatoResponse(Contato contato) {
+        return new ContatoResponse(contato.getId(), contato.getTipo(), contato.getValor());
+    }
+
     private OficinaResponse toOficinaResponse(Oficina oficina) {
-        if (oficina == null) {
-            return null;
-        }
-        return new OficinaResponse(
-                oficina.getId(),
-                oficina.getNome(),
-                oficina.getEndereco(),
-                oficina.getTelefone(),
-                oficina.getEmail()
-        );
+        if (oficina == null) return null;
+        List<ContatoResponse> contatos = oficina.getContatos().stream()
+                .map(this::toContatoResponse)
+                .collect(Collectors.toList());
+        return new OficinaResponse(oficina.getId(), oficina.getNome(), oficina.getEndereco(), contatos);
     }
 
     @PostMapping
-    public ResponseEntity<OficinaResponse> criar(@Valid @RequestBody OficinaRequest request, // Adicionado @Valid
-                                              @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<OficinaResponse> criar(@Valid @RequestBody OficinaRequest request,
+                                                 @AuthenticationPrincipal UserDetails userDetails) {
         Oficina oficina = oficinaService.criar(request, userDetails.getUsername());
-        return ResponseEntity.status(HttpStatus.CREATED).body(toOficinaResponse(oficina)); // Retorna DTO
+        return ResponseEntity.status(HttpStatus.CREATED).body(toOficinaResponse(oficina));
     }
 
     @GetMapping
-    public ResponseEntity<List<OficinaResponse>> listar() { // Retorna lista de DTOs
+    public ResponseEntity<List<OficinaResponse>> listar() {
         List<OficinaResponse> oficinas = oficinaService.findAll().stream()
                 .map(this::toOficinaResponse)
                 .collect(Collectors.toList());
@@ -57,31 +57,30 @@ public class OficinaController {
     @GetMapping("/{id}")
     public ResponseEntity<?> buscar(@PathVariable UUID id) {
         return oficinaService.findById(id)
-                .map(this::toOficinaResponse) // Mapeia para DTO
+                .map(this::toOficinaResponse)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Oficina não encontrada."));
     }
 
-    // Endpoint para buscar a oficina do usuário autenticado
     @GetMapping("/minha")
     public ResponseEntity<?> buscarMinha(@AuthenticationPrincipal UserDetails userDetails) {
         return oficinaService.findByUsername(userDetails.getUsername())
-                .map(this::toOficinaResponse) // Mapeia para DTO
+                .map(this::toOficinaResponse)
                 .<ResponseEntity<?>>map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).body("Nenhuma oficina cadastrada."));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<OficinaResponse> atualizar(@PathVariable UUID id,
-                                                  @Valid @RequestBody OficinaRequest request, // Adicionado @Valid
-                                                  @AuthenticationPrincipal UserDetails userDetails) {
+                                                     @Valid @RequestBody OficinaRequest request,
+                                                     @AuthenticationPrincipal UserDetails userDetails) {
         Oficina oficina = oficinaService.update(id, request, userDetails.getUsername());
-        return ResponseEntity.ok(toOficinaResponse(oficina)); // Retorna DTO
+        return ResponseEntity.ok(toOficinaResponse(oficina));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable UUID id,
-                                    @AuthenticationPrincipal UserDetails userDetails) {
+                                        @AuthenticationPrincipal UserDetails userDetails) {
         oficinaService.delete(id, userDetails.getUsername());
         return ResponseEntity.noContent().build();
     }

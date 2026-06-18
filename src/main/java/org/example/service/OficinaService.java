@@ -44,8 +44,6 @@ public class OficinaService {
         Oficina oficina = Oficina.builder()
                 .nome(request.nome())
                 .endereco(request.endereco())
-                .telefone(request.telefone())
-                .email(request.email())
                 .build();
 
         oficina = oficinaRepository.save(oficina);
@@ -88,8 +86,6 @@ public class OficinaService {
 
         oficina.setNome(request.nome());
         oficina.setEndereco(request.endereco());
-        oficina.setTelefone(request.telefone());
-        oficina.setEmail(request.email());
 
         return oficinaRepository.save(oficina);
     }
@@ -104,9 +100,6 @@ public class OficinaService {
             throw new ForbiddenException("Você não tem permissão para excluir esta oficina.");
         }
 
-        // Servico.oficina_id é NOT NULL, então excluir a oficina com serviços
-        // vinculados causaria uma violação de FK no banco. Em vez de deixar
-        // estourar um erro genérico de banco, avisamos o usuário de forma clara.
         if (!servicoRepository.findByOficinaId(id).isEmpty()) {
             throw new OficinaComServicosException(
                     "Não é possível excluir a oficina enquanto houver serviços cadastrados. " +

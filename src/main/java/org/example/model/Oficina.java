@@ -1,6 +1,8 @@
 package org.example.model;
 
 import jakarta.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -15,17 +17,16 @@ public class Oficina {
     private String nome;
 
     private String endereco;
-    private String telefone;
-    private String email;
+
+    @OneToMany(mappedBy = "oficina", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Contato> contatos = new ArrayList<>();
 
     public Oficina() {}
 
-    public Oficina(UUID id, String nome, String endereco, String telefone, String email) {
+    public Oficina(UUID id, String nome, String endereco) {
         this.id = id;
         this.nome = nome;
         this.endereco = endereco;
-        this.telefone = telefone;
-        this.email = email;
     }
 
     public UUID getId() { return id; }
@@ -37,11 +38,8 @@ public class Oficina {
     public String getEndereco() { return endereco; }
     public void setEndereco(String endereco) { this.endereco = endereco; }
 
-    public String getTelefone() { return telefone; }
-    public void setTelefone(String telefone) { this.telefone = telefone; }
-
-    public String getEmail() { return email; }
-    public void setEmail(String email) { this.email = email; }
+    public List<Contato> getContatos() { return contatos; }
+    public void setContatos(List<Contato> contatos) { this.contatos = contatos; }
 
     public static Builder builder() { return new Builder(); }
 
@@ -49,17 +47,13 @@ public class Oficina {
         private UUID id;
         private String nome;
         private String endereco;
-        private String telefone;
-        private String email;
 
-        public Builder id(UUID id)             { this.id = id; return this; }
-        public Builder nome(String nome)       { this.nome = nome; return this; }
-        public Builder endereco(String e)      { this.endereco = e; return this; }
-        public Builder telefone(String t)      { this.telefone = t; return this; }
-        public Builder email(String email)     { this.email = email; return this; }
+        public Builder id(UUID id)         { this.id = id; return this; }
+        public Builder nome(String nome)   { this.nome = nome; return this; }
+        public Builder endereco(String e)  { this.endereco = e; return this; }
 
         public Oficina build() {
-            return new Oficina(id, nome, endereco, telefone, email);
+            return new Oficina(id, nome, endereco);
         }
     }
 }
