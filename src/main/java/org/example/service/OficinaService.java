@@ -65,6 +65,7 @@ public class OficinaService {
         return oficinaRepository.findById(id);
     }
 
+    @Transactional // Added @Transactional to ensure lazy loading works
     @PreAuthorize("hasAnyRole('USER', 'OWNER')")
     public Optional<Oficina> findByUsername(String username) {
         return userRepository.findByUsername(username)
