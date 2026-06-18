@@ -20,10 +20,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
-        var user = authService.registerUser(request); // Chamando o método atualizado
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body("Usuário " + user.getUsername() + " registrado com sucesso!");
+    public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
+        String token = authService.registerUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token));
     }
 
     @PostMapping("/login")
