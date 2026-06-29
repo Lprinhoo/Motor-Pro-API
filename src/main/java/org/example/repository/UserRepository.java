@@ -7,5 +7,6 @@ import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByUsername(String username);
-    Optional<User> findByEmail(String email); // Adicionado para redefinição de senha
+    Optional<User> findByEmail(String email);
+    Optional<User> findByGoogleId(String googleId); // Novo método para encontrar usuário pelo Google ID
 }
