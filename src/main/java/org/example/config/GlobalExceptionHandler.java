@@ -1,13 +1,13 @@
 package org.example.config;
 
 import org.example.exception.ApiException;
-import org.example.service.UsernameAlreadyExistsException;
+import org.example.exception.UsernameAlreadyExistsException; // Importação corrigida
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.AccessDeniedException; // Import adicionado
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -22,11 +22,13 @@ public class GlobalExceptionHandler {
 
     private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-    @ExceptionHandler(UsernameAlreadyExistsException.class)
-    public ResponseEntity<Map<String, String>> handleUsernameExists(UsernameAlreadyExistsException ex) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(Map.of("error", "Nome de usuário já está em uso."));
-    }
+    // O método handleUsernameExists foi removido, pois UsernameAlreadyExistsException
+    // agora estende ApiException e será tratado por handleApiException.
+    // @ExceptionHandler(UsernameAlreadyExistsException.class)
+    // public ResponseEntity<Map<String, String>> handleUsernameExists(UsernameAlreadyExistsException ex) {
+    //     return ResponseEntity.status(HttpStatus.CONFLICT)
+    //             .body(Map.of("error", "Nome de usuário já está em uso."));
+    // }
 
     @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
     public ResponseEntity<Map<String, String>> handleAuthErrors(RuntimeException ex) {
@@ -54,10 +56,7 @@ public class GlobalExceptionHandler {
 
     // Trata todas as exceções de negócio que carregam seu próprio status HTTP
     // (ResourceNotFoundException -> 404, ForbiddenException -> 403,
-    // OficinaAlreadyExistsException -> 409, OficinaComServicosException -> 409, etc.)
-    // Importante: este handler é "encontrado" pelo Spring antes do handleRuntime
-    // abaixo porque ApiException é mais específico que RuntimeException na
-    // hierarquia de tipos, então o status correto é sempre respeitado.
+    // UsernameAlreadyExistsException -> 409, etc.)
     @ExceptionHandler(ApiException.class)
     public ResponseEntity<Map<String, String>> handleApiException(ApiException ex) {
         return ResponseEntity.status(ex.getStatus())
