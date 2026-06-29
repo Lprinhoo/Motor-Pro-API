@@ -19,6 +19,12 @@ public abstract class ApiException extends RuntimeException {
         this.status = status;
     }
 
+    // Construtor adicionado para suportar a causa (Throwable)
+    protected ApiException(HttpStatus status, String message, Throwable cause) {
+        super(message, cause);
+        this.status = status;
+    }
+
     public HttpStatus getStatus() {
         return status;
     }
