@@ -9,7 +9,6 @@ import org.example.dto.RegisterRequest;
 import org.example.model.User;
 import org.example.service.AuthService;
 import org.example.service.GoogleAuthService;
-import org.example.service.UserService; // Assumindo que você tem um UserService
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,12 +19,10 @@ public class AuthController {
 
     private final AuthService authService;
     private final GoogleAuthService googleAuthService;
-    private final UserService userService; // Injetar UserService
 
-    public AuthController(AuthService authService, GoogleAuthService googleAuthService, UserService userService) {
+    public AuthController(AuthService authService, GoogleAuthService googleAuthService) {
         this.authService = authService;
         this.googleAuthService = googleAuthService;
-        this.userService = userService;
     }
 
     @PostMapping("/register")
@@ -51,13 +48,11 @@ public class AuthController {
         String pictureUrl = (String) payload.get("picture"); // URL da foto de perfil
         String googleId = payload.getSubject(); // ID único do usuário no Google
 
-        // 3. Encontrar ou criar o usuário no seu sistema
-        // O UserService precisará de um método findOrCreateGoogleUser
-        User user = userService.findOrCreateGoogleUser(email, name, pictureUrl, googleId);
+        // 3. Encontrar ou criar o usuário no seu sistema usando AuthService
+        User user = authService.findOrCreateGoogleUser(email, name, pictureUrl, googleId);
 
         // 4. Gerar um JWT para o usuário autenticado
-        // Assumindo que authService.generateToken(username) existe ou você tem um JwtService
-        String token = authService.generateToken(user.getUsername()); // Usar o username (email) do usuário
+        String token = authService.generateToken(user); // Usar o método generateToken(User user) do AuthService
 
         // 5. Retornar o token para o cliente
         return ResponseEntity.ok(new AuthResponse(token));
