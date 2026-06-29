@@ -5,6 +5,7 @@ import org.example.exception.ForbiddenException;
 import org.example.exception.ResourceNotFoundException;
 import org.example.model.Contato;
 import org.example.model.Oficina;
+import org.example.model.TipoContato;
 import org.example.model.User;
 import org.example.repository.ContatoRepository;
 import org.example.repository.OficinaRepository;
@@ -21,13 +22,28 @@ public class ContatoService {
     private final ContatoRepository contatoRepository;
     private final OficinaRepository oficinaRepository;
     private final UserRepository userRepository;
+    private final PhoneValidator phoneValidator;
 
     public ContatoService(ContatoRepository contatoRepository,
                           OficinaRepository oficinaRepository,
-                          UserRepository userRepository) {
+                          UserRepository userRepository,
+                          PhoneValidator phoneValidator) {
         this.contatoRepository = contatoRepository;
         this.oficinaRepository = oficinaRepository;
         this.userRepository = userRepository;
+        this.phoneValidator = phoneValidator;
+    }
+
+    /**
+     * Para contatos do tipo TELEFONE ou WHATSAPP, valida o número com a
+     * libphonenumber e retorna a versão normalizada (E.164) a ser salva.
+     * Para os demais tipos, retorna o valor original sem alteração.
+     */
+    private String validarEPrepararValor(TipoContato tipo, String valor) {
+        if (tipo == TipoContato.TELEFONE || tipo == TipoContato.WHATSAPP) {
+            return phoneValidator.validarENormalizar(valor);
+        }
+        return valor;
     }
 
     private void verificarPropriedade(UUID oficinaId, String username) {
@@ -50,7 +66,8 @@ public class ContatoService {
         verificarPropriedade(oficinaId, username);
         Oficina oficina = oficinaRepository.findById(oficinaId)
                 .orElseThrow(() -> new ResourceNotFoundException("Oficina não encontrada."));
-        Contato contato = new Contato(request.tipo(), request.valor(), oficina);
+        String valor = validarEPrepararValor(request.tipo(), request.valor());
+        Contato contato = new Contato(request.tipo(), valor, oficina);
         return contatoRepository.save(contato);
     }
 
@@ -63,7 +80,7 @@ public class ContatoService {
             throw new ForbiddenException("Este contato não pertence a esta oficina.");
         }
         contato.setTipo(request.tipo());
-        contato.setValor(request.valor());
+        contato.setValor(validarEPrepararValor(request.tipo(), request.valor()));
         return contatoRepository.save(contato);
     }
 
