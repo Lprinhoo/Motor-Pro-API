@@ -1,5 +1,6 @@
 package org.example.service;
 
+import org.example.dto.AuthResponse; // Importar AuthResponse
 import org.example.dto.RegisterRequest;
 import org.example.exception.UsernameAlreadyExistsException;
 import org.example.model.User;
@@ -31,7 +32,7 @@ public class AuthService {
     }
 
     @Transactional
-    public String registerUser(RegisterRequest request) {
+    public AuthResponse registerUser(RegisterRequest request) { // Retorna AuthResponse
         if (userRepository.findByUsername(request.username()).isPresent()) {
             throw new UsernameAlreadyExistsException("Nome de usuário já está em uso.");
         }
@@ -46,19 +47,21 @@ public class AuthService {
         );
         userRepository.save(user);
 
-        // Retorna o token JWT para que o frontend possa autenticar
-        // imediatamente e chamar POST /api/oficinas na etapa seguinte
-        return jwtService.generateToken(user);
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user); // Gerar refresh token
+        return new AuthResponse(accessToken, refreshToken);
     }
 
-    public String authenticateUser(String username, String password) {
+    public AuthResponse authenticateUser(String username, String password) { // Retorna AuthResponse
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, password)
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         User user = (User) authentication.getPrincipal();
-        return jwtService.generateToken(user);
+        String accessToken = jwtService.generateToken(user);
+        String refreshToken = jwtService.generateRefreshToken(user); // Gerar refresh token
+        return new AuthResponse(accessToken, refreshToken);
     }
 
     /**
@@ -120,5 +123,10 @@ public class AuthService {
     // Método auxiliar para gerar token, se o AuthController precisar de um User object
     public String generateToken(User user) {
         return jwtService.generateToken(user);
+    }
+
+    // Novo método para gerar Refresh Token
+    public String generateRefreshToken(User user) {
+        return jwtService.generateRefreshToken(user);
     }
 }

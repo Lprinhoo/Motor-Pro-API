@@ -27,14 +27,14 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
-        String token = authService.registerUser(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(new AuthResponse(token));
+        AuthResponse authResponse = authService.registerUser(request); // Agora retorna AuthResponse completo
+        return ResponseEntity.status(HttpStatus.CREATED).body(authResponse);
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest request) {
-        String token = authService.authenticateUser(request.username(), request.password());
-        return ResponseEntity.ok(new AuthResponse(token));
+        AuthResponse authResponse = authService.authenticateUser(request.username(), request.password()); // Agora retorna AuthResponse completo
+        return ResponseEntity.ok(authResponse);
     }
 
     @PostMapping("/google")
@@ -51,10 +51,11 @@ public class AuthController {
         // 3. Encontrar ou criar o usuário no seu sistema usando AuthService
         User user = authService.findOrCreateGoogleUser(email, name, pictureUrl, googleId);
 
-        // 4. Gerar um JWT para o usuário autenticado
-        String token = authService.generateToken(user); // Usar o método generateToken(User user) do AuthService
+        // 4. Gerar Access Token e Refresh Token
+        String accessToken = authService.generateToken(user);
+        String refreshToken = authService.generateRefreshToken(user);
 
-        // 5. Retornar o token para o cliente
-        return ResponseEntity.ok(new AuthResponse(token));
+        // 5. Retornar os tokens para o cliente
+        return ResponseEntity.ok(new AuthResponse(accessToken, refreshToken));
     }
 }
